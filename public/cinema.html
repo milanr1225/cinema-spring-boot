@@ -45,18 +45,18 @@
         </div>
     </nav>
     <div class="container">
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Naziv</th>
-          <th scope="col">Lokacija</th>
-          <th scope="col">Opcije</th>
-        </tr>
-      </thead>
-      <tbody id="cinemas"></tbody>
-    </table>
-  </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Naziv</th>
+                    <th scope="col">Lokacija</th>
+                    <th scope="col">Opcije</th>
+                </tr>
+            </thead>
+            <tbody id="cinemas"></tbody>
+        </table>
+    </div>
     <div class="container">
         <pre id="json"></pre>
     </div>
@@ -65,25 +65,43 @@
         crossorigin="anonymous"></script>
     <script>
         const table = document.getElementById('cinemas')
+
+        function edit(id) {
+            alert("editujete")
+        }
+
+        function remove(id) {
+            if (!confirm(`Obrisi bioskop ${id}?`))
+                return
+
+            fetch(`api/cinema/${id}`,{ method: 'delete'})
+            .then(data=>window.location.reload())
+        }
+
         fetch('/api/cinema')
             .then(rsp => rsp.json())
             .then(data => {
                 let content = ''
-                for(let cinema of data){
-                content += `
+                for (let cinema of data) {
+                    content += `
           <tr>
             <th scope="row">${cinema.cinemaId}</th>
             <td>${cinema.name}</td>
-            <td>${cinema.address} min</td>
+            <td>${cinema.address}</td>
             <td>
-              <a href="./details.html?id=${cinema.cinemaId}" class="btn btn-sm btn-primary">
-                <i class="fa-solid fa-up-right-from-square"></i>Detalji
-              </a>  
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-success" type="button" onclick="edit(${cinema.cinemaId})">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </button> 
+                    <button class="btn btn-sm btn-danger" type="button" onclick="remove(${cinema.cinemaId})">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button> 
+                </div>
             </td>
           </tr>`
-            }
-            table.innerHTML = content
-        })
+                }
+                table.innerHTML = content
+            })
     </script>
 
 </body>
