@@ -78,6 +78,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="/js/utils.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search)
     const id = params.get('id')
@@ -85,24 +87,22 @@
     const inputId = document.getElementById('id')
     const inputName = document.getElementById('name')
     const inputAddress = document.getElementById('address')
-    
+
     function openAll() {
       window.location.href = '/cinema.html'
     }
 
-    if (id == null || id=='') {
+    if (id == null || id == '') {
       openAll()
     }
 
-    fetch(`/api/cinema/${id}`)
-      .then(rsp => rsp.json())
-      .then(data => {
-        inputId.value = data.cinemaId
-        inputName.value = data.name
-        inputAddress.value = data.address
-        document.getElementById('save')
-          .addEventListener('click', () => {
-            //Update obj via API
+    retrieveData(`/api/cinema/${id}`, (data) => {
+      inputId.value = data.cinemaId
+      inputName.value = data.name
+      inputAddress.value = data.address
+      document.getElementById('save')
+        .addEventListener('click', () => {
+          showConfirm('Sačuvaj iznmene?', () => {
             fetch(`/api/cinema/${data.cinemaId}`, {
               method: 'PUT',
               headers: {
@@ -113,8 +113,9 @@
                 address: inputAddress.value
               })
             }).then(rsp => openAll())
+          })
         })
-      })
+    })
 
 
   </script>

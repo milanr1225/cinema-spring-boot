@@ -84,6 +84,7 @@
 
     document.getElementById('save')
           .addEventListener('click', () => {
+            showConfirm('Dodaj novi bioskop?', () => {
             fetch(`/api/cinema`, {
               method: 'POST',
               headers: {
@@ -94,6 +95,7 @@
                 address: inputAddress.value
               })
             }).then(rsp => openAll())
+          })
         })
 
 

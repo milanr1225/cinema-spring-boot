@@ -66,26 +66,10 @@
     integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
     crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/utils.js"></script>
   <script>
-    Swal.fire({
-      title: 'Učitavamo filmove',
-      text: 'Molimo sačekajte...',
-      allowOutsideClick: false,
-      didOpen: () =>{
-      Swal.showLoading()
-      }
-    })
-   
-    fetch('https://movie.pequla.com/api/movie')
-      .then(rsp => rsp.json())
-      .then(data => {
-        const pre = document.getElementById('json')
-        pre.innerText = JSON.stringify(data, null, 2)
-
-        const list = document.getElementById('movies')
-        const sorted = data.sort((m1,m2) => {
-          return m2.movieId - m1.movieId
-        })
+    retrieveData('/api/movie', (data) => {
+      const list = document.getElementById('movies')
         let content = ''
         for (let movie of data) {
           content += `<div class="card movie-card">
@@ -102,8 +86,7 @@
                     </div>`
         }
         list.innerHTML = content
-        Swal.close()
-      })
+    })
   </script>
 </body>
 

@@ -45,6 +45,7 @@
         </div>
     </nav>
     <div class="container">
+        <a href="/new-cinema.html" class="btn btn-sm btn-primary">Dodaj bioskop</a>
         <table class="table">
             <thead>
                 <tr>
@@ -57,33 +58,31 @@
             <tbody id="cinemas"></tbody>
         </table>
     </div>
-    <div class="container">
-        <pre id="json"></pre>
-    </div>
+    
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
         crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/utils.js"></script>
     <script>
         const table = document.getElementById('cinemas')
 
         function edit(id) {
-            window.location.href='/edit-cinema.html?id=' + id
+            window.location.href = '/edit-cinema.html?id=' + id
         }
 
         function remove(id) {
-            if (!confirm(`Obrisi bioskop ${id}?`))
-                return
-
-            fetch(`api/cinema/${id}`,{ method: 'delete'})
-            .then(data=>window.location.reload())
+            showConfirm(`Obrisi bioskop ${id}?`, () => {
+                fetch(`api/cinema/${id}`, { method: 'delete' })
+                .then(data => window.location.reload())
+            })
         }
 
-        fetch('/api/cinema')
-            .then(rsp => rsp.json())
-            .then(data => {
-                let content = ''
-                for (let cinema of data) {
-                    content += `
+        retrieveData('/api/cinema', (data) => {
+            let content = ''
+            for (let cinema of data) {
+                content += `
           <tr>
             <th scope="row">${cinema.cinemaId}</th>
             <td>${cinema.name}</td>
@@ -99,9 +98,9 @@
                 </div>
             </td>
           </tr>`
-                }
-                table.innerHTML = content
-            })
+            }
+            table.innerHTML = content
+        })
     </script>
 
 </body>
