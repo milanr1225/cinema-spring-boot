@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="sr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Izmeni Projekciju :: FilmBox</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/global.css" />
+</head>
+
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="crud-container">
+            <div class="card">
+                <div class="card-header">
+                    <strong>Izmeni Projekciju</strong>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="id" class="form-label">ID:</label>
+                        <input type="number" class="form-control" id="id" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="movie" class="form-label">Naziv filma:</label>
+                        <select class="form-select" id="movie"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cinema" class="form-label">Bioskop:</label>
+                        <select class="form-select" id="cinema"></select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="time" class="form-label">Vreme Projekcije:</label>
+                        <input type="time" class="form-control" id="time">
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <button type="button" class="btn btn-success" id="save">
+                        <i class="fa-solid fa-floppy-disk"></i> Sačuvaj
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <pre id="json"></pre>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/utils.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search)
+        const id = params.get('id')
+
+        const inputId = document.getElementById('id')
+        const inputMovie = document.getElementById('movie')
+        const inputCinema = document.getElementById('cinema')
+        const inputTime = document.getElementById('time')
+
+        function openAll() {
+            window.location.href = '/time-table.html'
+        }
+
+        if (id == null || id == '') {
+            openAll()
+        }
+
+        retrieveData(`/api/time-table/${id}`, (data) => {
+            inputId.value = data.timeTableId
+            inputTime.value = data.timeStart
+
+            fetch('/api/movie')
+                .then(rsp => rsp.json())
+                .then(movies => {
+                    for (let movie of movies) {
+                        const opt = document.createElement('option')
+                        opt.value = movie.movieId
+                        opt.innerText = movie.title
+                        inputMovie.appendChild(opt)
+                    }
+                    //set default select value
+                    inputMovie.value = data.movieId
+                })
+
+            fetch('/api/cinema')
+                .then(rsp => rsp.json())
+                .then(cinemas => {
+                    for (let cinema of cinemas) {
+                        const opt = document.createElement('option')
+                        opt.value = cinema.cinemaId
+                        opt.innerText = cinema.name
+                        inputCinema.appendChild(opt)
+                    }
+                    //set default select value
+                    inputCinema.value = data.cinema.cinemaId
+                })
+
+            document.getElementById('save')
+                .addEventListener('click', () => {
+                    showConfirm('Sačuvaj iznmene?', () => {
+                        fetch(`/api/time-table/${id}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                movieId: inputMovie.value,
+                                timeStart: inputTime.value,
+                                cinema: {
+                                    cinemaId: inputCinema.value
+                                }
+                            })
+                        }).then(rsp => openAll())
+                    })
+                })
+        })
+
+
+    </script>
+</body>
+
+</html>

@@ -1,6 +1,7 @@
 package rs.ac.singidunum.pj.repo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,4 +12,6 @@ import rs.ac.singidunum.pj.entity.TimeTable;
 public interface TimeTableRepository extends JpaRepository<TimeTable, Integer> {
     
     List<TimeTable> findAllByDeletedAtIsNull();
+
+    Optional<TimeTable> findOneByTimeTableIdAndDeletedAtIsNull(Integer id);
 }

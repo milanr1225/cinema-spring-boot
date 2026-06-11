@@ -2,86 +2,99 @@
 <html lang="sr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Projekcije :: FilmBox</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
-    integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <style>
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projekcije :: FilmBox</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body data-bs-theme="dark">
-  <div class="container">
-    <pre id="reduced"></pre>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">#</th>
-          <th scope="col">Naziv filma</th>
-          <th scope="col">Žanr</th>
-          <th scope="col">Režiser</th>
-          <th scope="col">Bioskop</th>
-          <th scope="col">Početak projekcije</th>
-          <th scope="col">Vreme trajanja</th>
-          <th scope="col">Opcije</th>
-        </tr>
-      </thead>
-      <tbody id="tables"></tbody>
-    </table>
-  </div>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-    crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <script src="js/utils.js"></script>
-  <script>
-    retrieveData('/api/time-table', (data) => {
-      const list = document.getElementById('tables')
+    <div class="container">
+        <div class="card">
+            <div class="card-header fw-bold">Dostupne Projekcije</div>
+            <div class="card-body">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Naziv Filma</th>
+                            <th scope="col">Žanr</th>
+                            <th scope="col">Režiser</th>
+                            <th scope="col">Bioskop</th>
+                            <th scope="col">Početak Projekcije</th>
+                            <th scope="col">Vreme Trajanja</th>
+                            <th scope="col">Opcije</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tables"></tbody>
+                </table>
+            </div>
+            <div class="card-footer">
+                <a href="/new-time.html" class="btn btn-primary">Dodaj Projekciju</a>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/utils.js"></script>
+    <script>
+        function edit(id) {
+            window.location.href = `/edit-time.html?id=${id}`
+        }
 
-      // Fix reduce code - aka acc
-        // const pre = document.getElementById('reduced')
-        // const groupedMovies = Object.values(
-        //     data.reduce((grouped, timeTable) => {
-        //         const movie = timeTable.movie.movieId
+        function remove(id) {
+            showConfirm(`Obrisi projekciju ${id}?`, () => {
+                fetch(`/api/time-table/${id}`, { method: 'delete' })
+                    .then(rsp => window.location.reload())
+            })
+        }
 
-        //         if(!grouped(movieId)){
-        //             grouped[movieId] = {
-        //                 ...timeTable.movie,
-        //                 availableTimeTables: []
-        //             }
-        //         }
+        function createTicket(id) {
+            showConfirm(`Rezerviši kartu za projekciju ${id}?`, () => {
+                fetch(`/api/ticket/time-table/${id}`, { method: 'post' })
+                    .then(rsp => window.location.href = '/ticket.html')
+            })
+        }
 
-        //         grouped[movieId].availableTimeTables.push(timeTable)
-        //         return grouped
-        //     })
-        // )
-        // pre.innerHTML = JSON.stringify(groupedMovies, null, 2)
+        retrieveData('/api/time-table', (data) => {
+            const list = document.getElementById('tables')
 
-      let content = ''
-      for (let timeTable of data) {
-        content += `
-          <tr>
-            <th scope="row">${timeTable.timeTableId}</th>
-            <td>${timeTable.movie.title}</td>
-            <td>${timeTable.movie.movieGenres[0].genre.name}</td>
-            <td>${timeTable.movie.director.name}</td>
-            <td>${timeTable.cinema.name}</td>
-            <td>${timeTable.timeStart}</td>
-            <td>${timeTable.movie.runTime} min</td>
-            <td>
-              <a href="#" class="btn btn-sm btn-primary">
-                <i class="fa-solid fa-up-right-from-square"></i>Detalji
-              </a>  
-            </td>
-          </tr>`
-      }
-      list.innerHTML = content
-    })
-  </script>
+            let content = ''
+            for (let timeTable of data) {
+                content += `
+                    <tr>
+                        <th scope="row">${timeTable.timeTableId}</th>
+                        <td>${timeTable.movie.title}</td>
+                        <td>${timeTable.movie.movieGenres[0].genre.name}</td>
+                        <td>${timeTable.movie.director.name}</td>
+                        <td>${timeTable.cinema.name}</td>
+                        <td>${timeTable.timeStart.slice(0, 5)}h</td>
+                        <td>${timeTable.movie.runTime} min</td>
+                        <td>
+                            <div class="btn-group">
+                                <button class="btn btn-sm btn-primary" type="button" onclick="createTicket(${timeTable.timeTableId})">
+                                    <i class="fa-solid fa-up-right-from-square"></i>
+                                </button>
+                                <button class="btn btn-sm btn-success" type="button" onclick="edit(${timeTable.timeTableId})">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" type="button" onclick="remove(${timeTable.timeTableId})">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    `
+            }
+            list.innerHTML = content
+        })
+    </script>
 </body>
 
 </html>

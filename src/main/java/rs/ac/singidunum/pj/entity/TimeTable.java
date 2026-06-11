@@ -28,7 +28,6 @@ public class TimeTable {
     private Integer timeTableId;
 
     @Column(nullable = false)
-    @JsonIgnore
     private Integer movieId;
 
     @Transient
@@ -40,6 +39,9 @@ public class TimeTable {
 
     @Column(nullable = false)
     private LocalTime timeStart;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
 
