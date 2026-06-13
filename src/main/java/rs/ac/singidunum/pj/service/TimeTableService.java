@@ -2,6 +2,7 @@ package rs.ac.singidunum.pj.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import rs.ac.singidunum.pj.repo.TimeTableRepository;
 import rs.ac.singidunum.pj.entity.TimeTable;
+import rs.ac.singidunum.pj.model.MovieModel;
 
 @Service
 @RequiredArgsConstructor
@@ -18,13 +20,21 @@ public class TimeTableService {
     private final CinemaService cinemaService;
 
     public List<TimeTable> getAll() {
-        List<TimeTable> timeTables = repository.findAllByDeletedAtIsNull();
+        List<TimeTable> list = repository.findAllByDeletedAtIsNull();
+        List<Integer> ids = list.stream().map(obj -> obj.getMovieId()).toList();
+        List<MovieModel> movies = movieService.getByIds(ids);
 
-        for(TimeTable t : timeTables) {
-            t.setMovie(movieService.getById(t.getMovieId()).get());
+        for(TimeTable timeTable : list) {
+            for (MovieModel movie : movies) {
+                if (Objects.equals(timeTable.getMovieId(), movie.getMovieId())) {
+                    timeTable.setMovie(movie);
+                }
+            }
         }
 
-        return timeTables;
+        
+
+        return list;
     }
 
     public Optional<TimeTable> getById(Integer id) {

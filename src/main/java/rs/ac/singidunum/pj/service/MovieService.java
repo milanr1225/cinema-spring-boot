@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.RequestBodySpec;
 
 import rs.ac.singidunum.pj.model.MovieModel;
 
@@ -41,5 +43,15 @@ public class MovieService {
     } catch (HttpClientErrorException.NotFound ex) {
       return Optional.empty();
     }
+  }
+
+  public List<MovieModel> getByIds(List<Integer> ids) {
+    return client.post()
+        .uri("/movie/list")
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(ids)
+        .retrieve()
+        .body(new ParameterizedTypeReference<>() {
+        });
   }
 }
