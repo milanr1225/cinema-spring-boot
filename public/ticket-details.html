@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="sr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalji karte :: FilmBox</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css"
+        integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/css/global.css" />
+</head>
+
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="crud-container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="/index.html">Početna</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="/ticket.html">Karte</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        Detalji
+                    </li>
+                </ol>
+            </nav>
+            <div class="card mb-3">
+                <div class="row g-0">
+                    <div class="col-md-4">
+                        <img id="qr-code" class="img-fluid rounded-start">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body">
+                            <h5 class="card-title" id="title">Naziv filma</h5>
+                            <!-- <p class="card-text" id="desc"></p> -->
+                            <p class="card-text">
+                                <small class="text-body-secondary" id="time"></small><br>
+                                <small class="text-body-secondary" id="paid"></small><br>
+                                <small class="text-body-secondary" id="sub"></small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/utils.js"></script>
+    <script>
+        const params = new URLSearchParams(window.location.search)
+        const id = params.get('id')
+
+        retrieveData(`api/ticket/${id}`, (data) => {
+
+            const qrCode = document.getElementById('qr-code')
+            const code = `${data.ticketId}-${data.timeTable.movie.internalId}-${data.createdAt}`
+            qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?size=640x640&data=${code}`
+            qrCode.alt = code
+
+            const title = document.getElementById('title')
+            title.innerText = data.timeTable.movie.title
+
+            // const desc = document.getElementById('desc')
+            // desc.innerText = data.timeTable.movie.shortDescription
+
+            const sub = document.getElementById('sub')
+            sub.innerText = code
+
+            const time = document.getElementById('time')
+            time.innerText = `${data.timeTable.cinema.name} u ${data.timeTable.timeStart.slice(0, 5)}h`
+
+            const paid = document.getElementById('paid')
+            paid.innerText = data.paidAt ? `Plaćeno: ${formatDate(data.paidAt)}` : `Nije plaćeno`
+        })
+
+
+    </script>
+</body>
+
+</html>

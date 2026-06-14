@@ -14,7 +14,6 @@
 
 <body data-bs-theme="dark">
     <div class="container">
-        <p>Dodaj placanje, brisanje i prikaz detalja pritiskom na qr kod dugme</p>
         <div class="card">
             <div class="card-header fw-bold">
                 Moje Karte
@@ -35,7 +34,9 @@
                 </table>
             </div>
             <div class="card-footer">
-                <a href="#" class="btn btn-primary">Dodaj Kartu</a>
+                <a href="time-table.html" class="btn btn-primary">
+                    <i class="fa-solid fa-up-right-from-square"></i> Otvori projekcije
+                </a>
             </div>
         </div>
     </div>
@@ -98,7 +99,7 @@
             }else{
                 return `
                 <div class="btn-group"> 
-                    <a class="btn btn-sm btn-info" href="#">
+                    <a class="btn btn-sm btn-info" href="/ticket-details.html?id=${ticket.ticketId}">
                         <i class="fa-solid fa-qrcode"></i>
                     </a>
                 </div>
